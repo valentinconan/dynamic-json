@@ -27,6 +27,10 @@ func UnmarshalJSONFromInterface[T any](data interface{}) T {
 
 func UnmarshalJSON[T any](bs []byte) T {
 
+	if string(bs)[:1] == "<" {
+		panic("It seems that this is not a JSON but an XML instead")
+	}
+	
 	var structuredData map[string]interface{}
 
 	if err := json.Unmarshal(bs, &structuredData); err != nil {
@@ -104,7 +108,7 @@ func deepConvert(structuredData map[string]interface{}, structValue reflect.Valu
 			}
 		} else if structValue.Kind() == 25 {
 			//if the current structValue is a real struct
-			if fields.IsValid() {
+			if fields.IsValid() && fields.IsNil(){
 				//if field exist and is valid, it might be necessary to initialise it
 				fields.Set(reflect.ValueOf(make(map[string]interface{})))
 			}
